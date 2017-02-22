@@ -1,5 +1,5 @@
 ---
-- hosts: dwh-prod-fmo
+- hosts: oltp-rac-test-fmo
   tasks:
    - include_vars: vars/rpm_to_check.yml
    - include_vars: vars/kernel_params_to_check.yml
