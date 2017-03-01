@@ -1,0 +1,19 @@
+---
+# tasks file for gathering facts
+- name: gather RPM version information
+  shell: /usr/bin/yum list installed {{ item }} | grep {{ item }}
+  ignore_errors: yes
+  changed_when: False
+  with_items: "{{ rpms_to_check }}"
+  register: rpms_checked
+- name: gather kernel parameter information
+  shell: /sbin/sysctl {{ item }}
+  ignore_errors: yes
+  changed_when: False
+  with_items: "{{ kernel_params_to_check }}"
+  register: kernel_params_checked
+- name: gather Huge Pages information
+  shell: /bin/grep Huge /proc/meminfo
+  ignore_errors: yes
+  changed_when: False
+  register: huge_pages
