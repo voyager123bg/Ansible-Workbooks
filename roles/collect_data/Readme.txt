@@ -7,3 +7,5 @@ ansible-playbook -i ../Hosts collect_data.yml -v > dwh_prod_fmo.csv
 
 In order to make the data excel-friendly:
 cat dwh-prod-fmo.csv |sed 's/\[//g; s/\]//g; s/=/,/g; s/>//g; s/"//g; s/false:true//; s/ok://g; s/failed://g; s/(item//g; s/ignoring...//g; s/)//g' > dwh-prod-fmo-nomalized.csv
+
+for i in *.csv; do cat $i |sed 's/\[//g; s/\]//g; s/=/,/g; s/>//g; s/"//g; s/false:true//; s/ok://g; s/failed://g; s/(item//g; s/ignoring...//g; s/)//g' > $i-normalized.csv; done
