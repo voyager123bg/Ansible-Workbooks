@@ -1,0 +1,50 @@
+---
+#- debug: msg="the value of id_rsa is {{lookup('file', aws_admin_ssh_key) }}"
+
+- name: create key pair using key_material obtained using 'file' lookup plugin
+  local_action:
+    module: ec2_key
+    aws_access_key: "{{ vault_aws_access_key_id }}"
+    aws_secret_key: "{{ vault_aws_access_secret }}"
+    region: "{{ aws_region }}"
+    name: "{{ aws_ssh_keypair }}"
+    key_material: "{{ lookup('file', aws_admin_ssh_key) }}"
+
+- name: Ensure instance running (if exists).
+  local_action:
+    module: ec2
+    aws_access_key: "{{ vault_aws_access_key_id }}"
+    aws_secret_key: "{{ vault_aws_access_secret }}"
+    region: "{{ aws_region }}"
+    instance_tags:
+        Name: Demo
+    state: running
+  ignore_errors: true
+
+
+- name: Create the EC2 instance
+  local_action:
+    module: ec2
+    assign_public_ip: yes
+    vpc_subnet_id: "{{ aws_vpc_subnet_id }}"
+    aws_access_key: "{{ vault_aws_access_key_id }}"
+    aws_secret_key: "{{ vault_aws_access_secret }}"
+    region: "{{ aws_region }}"
+    instance_type: "{{ aws_instance_type }}"
+    image: "{{ aws_ami }}"
+    wait: true
+    exact_count: 1
+    count_tag:
+      Name: Demo
+    instance_tags:
+      Name: Demo
+      Function: webserver
+    keypair: "{{ aws_ssh_keypair }}"
+  register: ec2
+
+- debug: var=ec2.tagged_instances
+- debug: var=ec2.tagged_instances.0.public_ip
+- name: save IP to inventory file
+  template:
+    src="inventory.j2"
+    dest="inventory"

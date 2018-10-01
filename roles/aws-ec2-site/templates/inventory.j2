@@ -1,0 +1,12 @@
+# {{ ansible_managed }}
+[local]
+localhost
+
+[webservers]
+{% for result in ec2.tagged_instances %}
+{{ result.public_ip }}
+{% endfor %}
+
+[common:children]
+local
+webservers
