@@ -1,11 +1,10 @@
 ---
 # defaults file for aws-ec2-site
 aws_region: us-east-1
-aws_ec2_group_name: default
-aws_ec2_group_description: Default group
 aws_vpc_id: vpc-778aa30c
 aws_instance_type: t2.micro
 aws_ssh_keypair: mykey
 aws_ami: ami-04169656fea786776
 aws_vpc_subnet_id: subnet-2515956f 
 aws_admin_ssh_key: /home/nikicveti/.ssh/id_rsa.pub
+aws_use_local_ssh_key: false
