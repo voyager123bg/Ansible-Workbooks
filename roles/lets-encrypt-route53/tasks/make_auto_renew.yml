@@ -1,0 +1,25 @@
+---
+# 1. Make sure ansible + dependencies is installed on target machine - done in install.yml
+# 2. use template to fill-out issue_cert_route53way.yml and save in /root/issue_cert_route53way.yml
+- name: Prepare the renew certificate playbook
+  template:
+    src:  issue_cert_route53way.yml.j2
+    dest: /root/renew_cert.yml
+
+- name: Secure renew certificate playbook
+  file:
+    path: /root/renew_cert.yml
+    owner: root
+    mode: 0400
+
+# 3. make cron ansible-playbook /root/issue_cert_route53way.yml ON DESTINATION HOST!
+# 43 6 * * * /usr/bin/ansible-playbook /root/renew_cert.yml
+- name: Create crontab to renew SSL certificates
+  cron:
+    name: 'renew SSL certificates'
+    job: ' /usr/bin/ansible-playbook /root/renew_cert.yml'
+    minute: '{{ ler53_cron_renew[0] }}'
+    hour: '{{ ler53_cron_renew[1] }}'
+    day: '{{ ler53_cron_renew[2] }}'
+    weekday: '{{ ler53_cron_renew[3] }}'
+    month: '{{ ler53_cron_renew[4] }}'

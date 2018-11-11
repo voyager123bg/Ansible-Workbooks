@@ -1,0 +1,9 @@
+---
+- name: Install procedure
+  include: install.yml
+
+- name: Issue certificate
+  include: issue_cert_route53way.yml
+
+- name: Make autorenew
+  include: make_auto_renew.yml
