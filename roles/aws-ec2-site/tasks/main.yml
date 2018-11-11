@@ -9,6 +9,7 @@
     region: "{{ aws_region }}"
     name: "{{ aws_ssh_keypair }}"
     key_material: "{{ lookup('file', aws_admin_ssh_key) }}"
+  when: "{{ aws_use_local_ssh_key }}"
 
 - name: Ensure instance running (if exists).
   local_action:
@@ -17,10 +18,10 @@
     aws_secret_key: "{{ vault_aws_access_secret }}"
     region: "{{ aws_region }}"
     instance_tags:
-        Name: Demo
+      Name: "{{ item }}"
     state: running
+  with_items: "{{ aws_create_ec2_servers }}"
   ignore_errors: true
-
 
 - name: Create the EC2 instance
   local_action:
@@ -35,15 +36,17 @@
     wait: true
     exact_count: 1
     count_tag:
-      Name: Demo
+      Name: "{{ item }}"
     instance_tags:
-      Name: Demo
-      Function: webserver
+      Name: "{{ item }}"
     keypair: "{{ aws_ssh_keypair }}"
+  with_items: "{{ aws_create_ec2_servers }}"
   register: ec2
 
 - debug: var=ec2.tagged_instances
+
 - debug: var=ec2.tagged_instances.0.public_ip
+
 - name: save IP to inventory file
   template:
     src="inventory.j2"
